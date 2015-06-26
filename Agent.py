@@ -9,7 +9,10 @@
 # These methods will be necessary for the project's main method to run.
 
 # Install Pillow and uncomment this line to access image processing.
-#from PIL import Image
+# from PIL import Image
+import itertools, copy
+from DictDiff import DictDiffer
+
 
 class Agent:
     # The default constructor for your Agent. Make sure to execute any
@@ -43,159 +46,137 @@ class Agent:
     #
     # Make sure to return your answer *as an integer* at the end of Solve().
     # Returning your answer as a string may cause your program to crash.
-    def Solve(self,problem):
 
-        parsedObject= self.constructCorrectStructures(problem)
-        answer =self.findAnswer(parsedObject)
+    row1 = ["A", "B", "C"]
+    row2 = ["D", "E", "F"]
+    row3 = ["G", "H", "X"]
 
-        if len(answer)>0:
-            return answer.keys()[0]
+    LOCATION_ATTR = ['left-of', 'right-of', 'above', "inside", "overlaps"]
+
+    X_COST_OBJECTS = {
+        "fill": 2,
+        "size": 3,
+        "width": 5,
+        "height": 5,
+        "angle": 7,
+        "shape": 9,
+
+    }
+    SIZE={
+        "very small" :1,
+        "small" :2,
+        "medium" :3,
+        "large" :4,
+        "very large" :5,
+        "huge" :6,
+        }
+    transformation_hash={}
+
+    def Solve(self, problem):
+        similarity_scores = {}
+
+        # print "problem***************"
+        # print "problem type: "+ problem.problemType
+        print "problem name: " + problem.name
+        # print "problem visual?: ",  problem.hasVisual
+        # print "problem verbal: ", problem.hasVerbal
+        # print "problem figures: ",  problem.figures
+
+        # TODO: account for the angle
+        # TODO: calculate
+
+
+        figure_a = problem.figures["A"]
+        figure_b = problem.figures["B"]
+        figure_c = problem.figures["C"]
+        figure_d = problem.figures["D"]
+        figure_e = problem.figures["E"]
+        figure_f = problem.figures["F"]
+        figure_g = problem.figures["G"]
+        figure_h = problem.figures["H"]
+        similarity_scores['A_B'] = self.CalculateFigureScores(figure_a, figure_b)
+        similarity_scores['A_D'] = self.CalculateFigureScores(figure_a, figure_d)
+        similarity_scores['B_C'] = self.CalculateFigureScores(figure_b, figure_c)
+        similarity_scores['B_E'] = self.CalculateFigureScores(figure_b, figure_e)
+        similarity_scores['C_F'] = self.CalculateFigureScores(figure_c, figure_f)
+        similarity_scores['E_H'] = self.CalculateFigureScores(figure_e, figure_h)
+        similarity_scores['E_F'] = self.CalculateFigureScores(figure_e, figure_f)
+        similarity_scores['D_E'] = self.CalculateFigureScores(figure_d, figure_e)
+        similarity_scores['D_G'] = self.CalculateFigureScores(figure_d, figure_g)
+        similarity_scores['G_H'] = self.CalculateFigureScores(figure_g, figure_h)
+
+        first_row_score = similarity_scores['A_B'] + similarity_scores['B_C']
+        second_row_score = similarity_scores['D_E'] + similarity_scores['E_F']
+
+        first_col_score = similarity_scores['A_D'] + similarity_scores['D_G']
+        second_col_score = similarity_scores['B_E'] + similarity_scores['E_H']
+
+        answers = {}
+
+        for x in range(1, 9):
+            candidate = problem.figures[str(x)]
+
+            scores_F_CANDIDATE = self.CalculateFigureScores(figure_f, candidate)
+            scores_H_CANDIDATE = self.CalculateFigureScores(figure_h, candidate)
+            print "h:", scores_H_CANDIDATE, "f:",scores_F_CANDIDATE
+
+            col_distance = scores_F_CANDIDATE - similarity_scores['C_F']
+            row_distance = scores_H_CANDIDATE - similarity_scores['G_H']
+
+            third_col_score = similarity_scores['C_F'] + scores_F_CANDIDATE
+            third_row_score = similarity_scores['G_H'] + scores_H_CANDIDATE
+
+            candidate_score = (abs(col_distance) + abs(row_distance))+ \
+                              ( abs((first_row_score - second_row_score) - (second_row_score - third_row_score))) +\
+                              ( abs((first_col_score - second_col_score) - (second_col_score - third_col_score)))
+
+            print "values: ", (abs(col_distance) + abs(row_distance)),( abs(first_row_score - second_row_score) - abs(second_row_score - third_row_score)) ,( abs(first_col_score - second_col_score) - abs(second_col_score - third_col_score))
+
+            answers[x]=candidate_score
+
+        best_candidates_count=  [i for i, x in enumerate(answers) if x == min(answers, key=answers.get)]
+        print "best choices", best_candidates_count
+        if len(best_candidates_count)>1:
+            # indices = [i for i, x in enumerate(answers) if x == min(answers, key=answers.get).value]
+            # self.calculateBasedOnTransform(indices, self.transformation_hash)
+
+
+            return-1
         else:
-            return -1
-
-    def constructCorrectStructures(self, problem):
-        problems={}
-        problems['given']={}
-        problems['solutions']={}
-        problems['problemSize']= str.split(problem.problemType, 'x')
-        newProblem ={};
-        for figure in  problem.figures:
-            if figure.isalpha():
-                self.appendProblemToCorrectStructures(problems, problem, figure, 1)
-            else:
-                 self.appendProblemToCorrectStructures(problems, problem, figure, 0)
-        newProblem=problems;
-
-        return newProblem;
+            print answers
+            return min(answers, key=answers.get)
 
 
+    def CalculateFigureScores(self, fig1, fig2):
+        # add a point for every object added or deleted
+        obj_count_change= len(fig1.objects) - len(fig2.objects)
+        self.transformation_hash[fig1.name+"_"+fig2.name]= {"obj_count_change":obj_count_change}
+        score = abs(obj_count_change*11)
+
+        obj1 = sorted(fig1.objects, key=fig1.objects.get)
+        obj2 = sorted(fig2.objects, key=fig2.objects.get)
+        for x, y in zip(obj1, obj2):
+            self.transformation_hash[fig1.name+"_"+fig2.name][x]={'transform':self.calculateObjectScores(fig1.objects[x].attributes, fig2.objects[y].attributes)['transform']}
+            score += self.calculateObjectScores(fig1.objects[x].attributes, fig2.objects[y].attributes)['score']
+
+        return score
+
+    def calculateObjectScores(self, obj1, obj2):
+        score = 1
+        diff = DictDiffer(obj1, obj2)
+        new_att = diff.added()
+        del_attr = diff.removed()
+        changed_attr = diff.changed()
+        unchanged_att = diff.unchanged()
+        transformation_values={}
+        for x in changed_attr:
+
+            transformation_values[x]=obj2[x]
+            if x not in self.LOCATION_ATTR:
+                score *= self.X_COST_OBJECTS[x]
+            if x=='size':
+                score *= self.SIZE[obj2[x]]-self.SIZE[obj1[x]]
 
 
-    def appendProblemToCorrectStructures(self, problems, problem, figure, isProblem):
-        if isProblem:
-            parsedProblem={problem.figures[figure].name :[]}
-            for object in  problem.figures[figure].objects:
-                parsedProblem[problem.figures[figure].name].append(problem.figures[figure].objects[object].attributes )
-            problems['given'].update(parsedProblem)
-        else:
-            parsedSolution={ problem.figures[figure].name:[]}
-            for object in  problem.figures[figure].objects:
-                parsedSolution[problem.figures[figure].name].append(problem.figures[figure].objects[object].attributes)
-            problems['solutions'].update(parsedSolution)
+        return {'score':score, "transform":{'changed':changed_attr, "unchanged" : unchanged_att, "deleted": del_attr, 'end_values':transformation_values}}
 
-
-
-
-    def findAnswer(self, parsedObject):
-        filteredSolution = parsedObject['solutions']
-
-        #if 2x2 matrix
-        if parsedObject['problemSize'][0] == '2' and parsedObject['problemSize'][1] == '2' :
-            #if same # of figures present
-            self.removeAnswersBasedOnSize(parsedObject, filteredSolution)
-
-            problem_A = parsedObject['given']['A']
-            problem_B = parsedObject['given']['B']
-            problem_C = parsedObject['given']['C']
-            if len(problem_A)== len(problem_B):
-                for index, shape in enumerate(problem_A):
-
-                    for attribute in shape:
-
-                        if attribute =='shape':
-                            if problem_A[index]['shape']== problem_B[index]['shape']:
-                                indexToDelete =[]
-                                for solution in filteredSolution:
-                                    if problem_C[index]['shape']==filteredSolution[solution][index]['shape']:
-                                        continue
-                                    else:
-                                        indexToDelete.append(solution);
-                                for x in indexToDelete:
-                                    filteredSolution.pop(x)
-
-                        elif attribute =='fill':
-                            if problem_A[index]['fill']== problem_B[index]['fill']:
-                                indexToDelete =[]
-                                for solution in filteredSolution:
-                                    if problem_C[index]['fill']==filteredSolution[solution][index]['fill']:
-                                        continue
-                                    else:
-                                        indexToDelete.append(solution);
-
-                                for x in indexToDelete:
-                                    filteredSolution.pop(x)
-
-                        elif attribute =='size':
-                            if problem_A[index]['size']== problem_B[index]['size']:
-                                indexToDelete =[]
-                                for solution in filteredSolution:
-                                    if problem_C[index]['size']==filteredSolution[solution][index]['size']:
-                                        continue
-                                    else:
-                                        indexToDelete.append(solution);
-
-                                for x in indexToDelete:
-                                    filteredSolution.pop(x)
-
-                        elif attribute =='angle':
-                            if 'angle' in problem_B[index] and  problem_A[index]['angle']== problem_B[index]['angle']:
-                                indexToDelete =[]
-                                for solution in filteredSolution:
-                                    if problem_C[index]['angle']==filteredSolution[solution][index]['angle']:
-                                        continue
-                                    else:
-                                        indexToDelete.append(solution);
-
-                                for x in indexToDelete:
-                                    filteredSolution.pop(x)
-                            elif 'angle' in problem_B[index] and problem_A[index]['angle']!= problem_B[index]['angle']:
-                                rotation= abs(int(problem_A[index]['angle'])- int(problem_B[index]['angle']))
-                                indexToDelete =[]
-                                for solution in filteredSolution:
-                                    if abs(int(problem_C[index]['angle'])-int(filteredSolution[solution][index]['angle']))==rotation:
-                                        continue
-                                    else:
-                                        indexToDelete.append(solution);
-
-                                for x in indexToDelete:
-                                    filteredSolution.pop(x)
-
-
-
-
-        return filteredSolution;
-
-    def removeAnswersBasedOnSize(self,parsedObject,filteredSolution):
-        problem_A = parsedObject['given']['A']
-        problem_B = parsedObject['given']['B']
-        problem_C = parsedObject['given']['C']
-        indexToDelete=[]
-        if  len(problem_A)== len(problem_B):
-            #remove all solutions that miss cases number
-            for solution in filteredSolution:
-                if len(problem_C)==len(filteredSolution[solution]):
-                    continue
-                else:
-                    indexToDelete.append(solution)
-
-            for x in indexToDelete:
-                filteredSolution.pop(x)
-        elif len(problem_A)>len(problem_B):
-            for solution in filteredSolution:
-                if len(problem_C)>len(filteredSolution[solution]):
-                    continue
-                else:
-                    indexToDelete.append(solution);
-
-            for x in indexToDelete:
-                filteredSolution.pop(x)
-
-        elif len(problem_A)<len(problem_B):
-            for solution in filteredSolution:
-                if len(problem_C)>len(filteredSolution[solution]):
-                    continue
-                else:
-                    indexToDelete.append(solution)
-
-            for x in indexToDelete:
-                filteredSolution.pop(x)
