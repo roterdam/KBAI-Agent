@@ -118,7 +118,7 @@ class Agent:
 
             scores_F_CANDIDATE = self.CalculateFigureScores(figure_f, candidate)
             scores_H_CANDIDATE = self.CalculateFigureScores(figure_h, candidate)
-            print "h:", scores_H_CANDIDATE, "f:",scores_F_CANDIDATE
+            # print "h:", scores_H_CANDIDATE, "f:",scores_F_CANDIDATE
 
             col_distance = scores_F_CANDIDATE - similarity_scores['C_F']
             row_distance = scores_H_CANDIDATE - similarity_scores['G_H']
@@ -130,28 +130,35 @@ class Agent:
                               ( abs((first_row_score - second_row_score) - (second_row_score - third_row_score))) +\
                               ( abs((first_col_score - second_col_score) - (second_col_score - third_col_score)))
 
-            print "values: ", (abs(col_distance) + abs(row_distance)),( abs(first_row_score - second_row_score) - abs(second_row_score - third_row_score)) ,( abs(first_col_score - second_col_score) - abs(second_col_score - third_col_score))
+            # print "values: ", (abs(col_distance) + abs(row_distance)),( abs(first_row_score - second_row_score) - abs(second_row_score - third_row_score)) ,( abs(first_col_score - second_col_score) - abs(second_col_score - third_col_score))
 
             answers[x]=candidate_score
 
-        best_candidates_count=  [i for i, x in enumerate(answers) if x == min(answers, key=answers.get)]
-        print "best choices", best_candidates_count
-        if len(best_candidates_count)>1:
-            # indices = [i for i, x in enumerate(answers) if x == min(answers, key=answers.get).value]
-            # self.calculateBasedOnTransform(indices, self.transformation_hash)
+        # best_candidates_count=  [i for i, x in enumerate(answers) if x == min(answers, key=answers.get)]
+        best_candidates= []
+        first_lowest_index= min(answers, key=answers.get)
+        lowest_score=answers[first_lowest_index]
+        # print "count", best_candidates_count, "ls",lowest_score, "fls:", first_lowest_index
 
 
+        for k, v in answers.items():
+            if v==lowest_score:
+                best_candidates.append(k)
+        print "candidates", best_candidates
+        print answers
+            #        self.calculateBasedOnTransform(best_candidates)
+        if len(best_candidates)>1:
             return-1
         else:
             print answers
-            return min(answers, key=answers.get)
+            return best_candidates[0]
 
 
     def CalculateFigureScores(self, fig1, fig2):
         # add a point for every object added or deleted
-        obj_count_change= len(fig1.objects) - len(fig2.objects)
-        self.transformation_hash[fig1.name+"_"+fig2.name]= {"obj_count_change":obj_count_change}
-        score = abs(obj_count_change*11)
+        #obj_count_change= len(fig1.objects) - len(fig2.objects)
+        self.transformation_hash[fig1.name+"_"+fig2.name]= {}
+        score = 0
 
         obj1 = sorted(fig1.objects, key=fig1.objects.get)
         obj2 = sorted(fig2.objects, key=fig2.objects.get)
@@ -168,15 +175,24 @@ class Agent:
         del_attr = diff.removed()
         changed_attr = diff.changed()
         unchanged_att = diff.unchanged()
-        transformation_values={}
+        transform_values={}
+
+
         for x in changed_attr:
-
-            transformation_values[x]=obj2[x]
-            if x not in self.LOCATION_ATTR:
-                score *= self.X_COST_OBJECTS[x]
-            if x=='size':
+            transform_values[x]={"from":obj1[x], "to": obj2[x]}
+            if x in self.LOCATION_ATTR:
+                score*=1 #To DO figure out how to to deal with location
+                # if abs(len(obj2[x])-len(obj1[x]))>0:
+                #     score+=abs(len(obj1[x])-len(obj2[x]))
+            elif x=='size':
                 score *= self.SIZE[obj2[x]]-self.SIZE[obj1[x]]
+            else:
+                score *= self.X_COST_OBJECTS[x]
+        for x in new_att:
+            score+=4
+        for x in del_attr:
+            score+=14
+        return {'score':score, "transform":{'changed':changed_attr, "unchanged" : unchanged_att, "deleted": del_attr, 'changed_values':transform_values}}
 
 
-        return {'score':score, "transform":{'changed':changed_attr, "unchanged" : unchanged_att, "deleted": del_attr, 'end_values':transformation_values}}
 
