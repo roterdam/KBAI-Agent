@@ -9,9 +9,11 @@
 # These methods will be necessary for the project's main method to run.
 
 # Install Pillow and uncomment this line to access image processing.
-# from PIL import Image
+from PIL import Image
 import itertools, copy
 from DictDiff import DictDiffer
+from VisAgent import VisAgent
+
 
 
 class Agent:
@@ -53,6 +55,16 @@ class Agent:
 
     LOCATION_ATTR = ['left-of', 'right-of', 'above', "inside", "overlaps"]
 
+    TRENDS ={
+        'objects-added-left': 1,
+        'objects-added-right': 2,
+        'objects-added-above': 3,
+        'objects-added-below': 4,
+        'fill':1
+
+
+    }
+
     X_COST_OBJECTS = {
         "fill": 2,
         "size": 3,
@@ -75,12 +87,8 @@ class Agent:
     def Solve(self, problem):
         similarity_scores = {}
 
-        # print "problem***************"
-        # print "problem type: "+ problem.problemType
+
         print "problem name: " + problem.name
-        # print "problem visual?: ",  problem.hasVisual
-        # print "problem verbal: ", problem.hasVerbal
-        # print "problem figures: ",  problem.figures
 
         # TODO: account for the angle
         # TODO: calculate
@@ -130,40 +138,106 @@ class Agent:
                               ( abs((first_row_score - second_row_score) - (second_row_score - third_row_score))) +\
                               ( abs((first_col_score - second_col_score) - (second_col_score - third_col_score)))
 
-            # print "values: ", (abs(col_distance) + abs(row_distance)),( abs(first_row_score - second_row_score) - abs(second_row_score - third_row_score)) ,( abs(first_col_score - second_col_score) - abs(second_col_score - third_col_score))
-
             answers[x]=candidate_score
 
-        # best_candidates_count=  [i for i, x in enumerate(answers) if x == min(answers, key=answers.get)]
+
         best_candidates= []
         first_lowest_index= min(answers, key=answers.get)
         lowest_score=answers[first_lowest_index]
         # print "count", best_candidates_count, "ls",lowest_score, "fls:", first_lowest_index
 
-
         for k, v in answers.items():
             if v==lowest_score:
                 best_candidates.append(k)
         print "candidates", best_candidates
-        print answers
-            #        self.calculateBasedOnTransform(best_candidates)
+
         if len(best_candidates)>1:
-            return-1
+            answer= self.calculateScoresBasedOnTransformations(best_candidates, answers, problem)
+            return answer
         else:
-            print answers
-            return best_candidates[0]
+           return best_candidates[0]
+
+
+
+    def calculateScoresBasedOnTransformations(self, best_candidates, answers, problem):
+        best_scores ={}
+
+        for k in best_candidates:
+            best_scores[k]=answers[k]
+            if self.transformation_hash['C_F']['objects_added']==self.transformation_hash['F'+'_'+str(k)]['objects_added']:
+                best_scores[k]-=1
+            else:
+                best_scores[k]+=1
+
+            if self.transformation_hash['G_H']['objects_added']==self.transformation_hash['H'+'_'+str(k)]['objects_added']:
+                best_scores[k]-=1
+            else:
+                best_scores[k]+=1
+
+        new_best_candidates=[]
+        for k, v in best_scores.items():
+                if v == best_scores[min(best_scores, key=best_scores.get)]:
+                    new_best_candidates.append(k)
+        print "new candidates", new_best_candidates
+
+        if len(new_best_candidates)>1:
+
+            visAgent = VisAgent()
+            answer = visAgent.Solve(problem, new_best_candidates)
+            return answer
+
+        else:
+             return new_best_candidates[0]
+
+
+    def calculateScoresBasedOnTransformedObjects(self, best_candidates, answers,problem):
+        best_scores ={}
+
+        for k in best_candidates:
+            best_scores[k]=answers[k]
+
+            new_best_candidates=[]
+            if self.transformation_hash['C_F']['objects_transformed']==self.transformation_hash['F'+'_'+str(k)]['objects_transformed']:
+                best_scores[k]-=1
+            else:
+                 best_scores[k]+=1
+
+            if self.transformation_hash['G_H']['objects_transformed']==self.transformation_hash['H'+'_'+str(k)]['objects_transformed']:
+                best_scores[k]-=1
+            else:
+                best_scores[k]+=1
+
+
+        # print best_scores
+        for k, v in best_scores.items():
+                if v == best_scores[min(best_scores, key=best_scores.get)]:
+                    new_best_candidates.append(k)
+        # print "new obj candidates", new_best_candidates
+
+        if len(new_best_candidates)>1:
+            print "vis Agent"
+            visAgent = VisAgent()
+            answer = visAgent.Solve(problem, new_best_candidates)
+            return answer
+        else:
+             return new_best_candidates[0]
 
 
     def CalculateFigureScores(self, fig1, fig2):
         # add a point for every object added or deleted
-        #obj_count_change= len(fig1.objects) - len(fig2.objects)
+        obj_count_change= len(fig2.objects) - len(fig1.objects)
         self.transformation_hash[fig1.name+"_"+fig2.name]= {}
         score = 0
+        self.transformation_hash[fig1.name+"_"+fig2.name]["objects_added"]= obj_count_change
+        self.transformation_hash[fig1.name+"_"+fig2.name]["objects_transformed"]= 0
 
         obj1 = sorted(fig1.objects, key=fig1.objects.get)
         obj2 = sorted(fig2.objects, key=fig2.objects.get)
         for x, y in zip(obj1, obj2):
             self.transformation_hash[fig1.name+"_"+fig2.name][x]={'transform':self.calculateObjectScores(fig1.objects[x].attributes, fig2.objects[y].attributes)['transform']}
+            if self.transformation_hash[fig1.name+"_"+fig2.name][x]['transform']['changed']:
+                self.transformation_hash[fig1.name+"_"+fig2.name]["objects_transformed"]+=1
+
             score += self.calculateObjectScores(fig1.objects[x].attributes, fig2.objects[y].attributes)['score']
 
         return score
@@ -177,21 +251,35 @@ class Agent:
         unchanged_att = diff.unchanged()
         transform_values={}
 
-
+        attr_not_count=[]
         for x in changed_attr:
             transform_values[x]={"from":obj1[x], "to": obj2[x]}
             if x in self.LOCATION_ATTR:
                 score*=1 #To DO figure out how to to deal with location
+                if x=='left-of':
+                    if len(obj2[x])>len(obj1[x]):
+                         transform_values[x]={'pattern': 'items-added-right'}
+                    elif len(obj2[x])<len(obj1[x]):
+                        transform_values[x]={'pattern': 'items-removed-right'}
+                if x=='right-of':
+                    if len(obj2[x])>len(obj1[x]):
+                         transform_values[x]={'pattern': 'items-added-left'}
+                    elif len(obj2[x])<len(obj1[x]):
+                         transform_values[x]={'pattern': 'items-removed-left'}
+
+                if x=='above':
+                    if len(obj2[x])>len(obj1[x]):
+                         transform_values[x]={'pattern': 'items-added-below'}
+                    elif len(obj2[x])<len(obj1[x]):
+                        transform_values[x]={'pattern': 'items-removed-below'}
+
                 # if abs(len(obj2[x])-len(obj1[x]))>0:
                 #     score+=abs(len(obj1[x])-len(obj2[x]))
             elif x=='size':
                 score *= self.SIZE[obj2[x]]-self.SIZE[obj1[x]]
             else:
                 score *= self.X_COST_OBJECTS[x]
-        for x in new_att:
-            score+=4
-        for x in del_attr:
-            score+=14
+
         return {'score':score, "transform":{'changed':changed_attr, "unchanged" : unchanged_att, "deleted": del_attr, 'changed_values':transform_values}}
 
 

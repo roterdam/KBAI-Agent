@@ -3,11 +3,11 @@ Basic Problem C-01,3,Correct,3
 Basic Problem C-02,4,Correct,4
 Basic Problem C-03,4,Correct,4
 Basic Problem C-04,8,Correct,8
-Basic Problem C-05,-1,Skipped,3
-Basic Problem C-06,-1,Skipped,7
-Basic Problem C-07,-1,Skipped,2
-Basic Problem C-08,-1,Skipped,5
+Basic Problem C-05,3,Correct,3
+Basic Problem C-06,7,Correct,7
+Basic Problem C-07,2,Correct,2
+Basic Problem C-08,5,Correct,5
 Basic Problem C-09,2,Correct,2
-Basic Problem C-10,1,Incorrect,7
+Basic Problem C-10,2,Incorrect,7
 Basic Problem C-11,4,Correct,4
 Basic Problem C-12,5,Incorrect,8
