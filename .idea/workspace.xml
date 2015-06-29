@@ -2,10 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="45fb580c-6188-4789-a37f-15a580e23857" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/VisAgent.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Agent.py" afterPath="$PROJECT_DIR$/Agent.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/ProblemResults.csv" afterPath="$PROJECT_DIR$/ProblemResults.csv" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/SetResults.csv" afterPath="$PROJECT_DIR$/SetResults.csv" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="KBAI-Agent.iws" />
@@ -52,8 +48,8 @@
           <file leaf-file-name="ProblemResults.csv" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/ProblemResults.csv">
               <provider selected="true" editor-type-id="text-editor">
-                <state vertical-scroll-proportion="0.29411766" vertical-offset="0" max-vertical-offset="663">
-                  <caret line="13" column="0" selection-start-line="13" selection-start-column="0" selection-end-line="13" selection-end-column="0" />
+                <state vertical-scroll-proportion="0.15837105" vertical-offset="0" max-vertical-offset="663">
+                  <caret line="7" column="0" selection-start-line="7" selection-start-column="0" selection-end-line="7" selection-end-column="0" />
                   <folding />
                 </state>
               </provider>
@@ -80,10 +76,10 @@
               </provider>
             </entry>
           </file>
-          <file leaf-file-name="VisAgent.py" pinned="false" current-in-tab="true">
+          <file leaf-file-name="VisAgent.py" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/VisAgent.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state vertical-scroll-proportion="0.5656109" vertical-offset="0" max-vertical-offset="1050">
+                <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1050">
                   <caret line="25" column="0" selection-start-line="25" selection-start-column="0" selection-end-line="25" selection-end-column="0" />
                   <folding>
                     <element signature="e#1#12#0" expanded="true" />
@@ -113,11 +109,11 @@
               </provider>
             </entry>
           </file>
-          <file leaf-file-name="Agent.py" pinned="false" current-in-tab="false">
+          <file leaf-file-name="Agent.py" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/Agent.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state vertical-scroll-proportion="-79.51852" vertical-offset="793" max-vertical-offset="4575">
-                  <caret line="196" column="22" selection-start-line="196" selection-start-column="19" selection-end-line="196" selection-end-column="22" />
+                <state vertical-scroll-proportion="0.6399371" vertical-offset="2338" max-vertical-offset="4380">
+                  <caret line="183" column="0" selection-start-line="183" selection-start-column="0" selection-end-line="183" selection-end-column="0" />
                   <folding>
                     <element signature="e#415#436#0" expanded="true" />
                   </folding>
@@ -157,10 +153,10 @@
         <option value="$PROJECT_DIR$/Problems/Basic Problems C/Basic Problem C-12/ProblemData.txt" />
         <option value="$PROJECT_DIR$/SetResults.csv" />
         <option value="$PROJECT_DIR$/Problems/VisAgent.py" />
-        <option value="$PROJECT_DIR$/Agent.py" />
         <option value="$PROJECT_DIR$/Problems/ProblemSetList.txt" />
-        <option value="$PROJECT_DIR$/ProblemResults.csv" />
         <option value="$PROJECT_DIR$/VisAgent.py" />
+        <option value="$PROJECT_DIR$/Agent.py" />
+        <option value="$PROJECT_DIR$/ProblemResults.csv" />
       </list>
     </option>
   </component>
@@ -516,11 +512,11 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-2510" y="-315" width="2510" height="1388" extended-state="6" />
-    <editor active="true" />
+    <frame x="-2510" y="-315" width="2510" height="1388" extended-state="1" />
+    <editor active="false" />
     <layout>
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32834646" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.4559055" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.4559055" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.24949779" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
@@ -856,16 +852,6 @@
         <state />
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Agent.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-79.51852" vertical-offset="793" max-vertical-offset="4575">
-          <caret line="196" column="22" selection-start-line="196" selection-start-column="19" selection-end-line="196" selection-end-column="22" />
-          <folding>
-            <element signature="e#415#436#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Problems/Challenge Problems B/Challenge Problem B-12/Challenge Problem B-12.PNG">
       <provider selected="true" editor-type-id="images">
         <state />
@@ -907,14 +893,6 @@
         <state />
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/ProblemResults.csv">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.29411766" vertical-offset="0" max-vertical-offset="663">
-          <caret line="13" column="0" selection-start-line="13" selection-start-column="0" selection-end-line="13" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Problems/Basic Problems C/Basic Problem C-10/Basic Problem C-10.PNG">
       <provider selected="true" editor-type-id="images">
         <state />
@@ -922,11 +900,29 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/VisAgent.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.5656109" vertical-offset="0" max-vertical-offset="1050">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1050">
           <caret line="25" column="0" selection-start-line="25" selection-start-column="0" selection-end-line="25" selection-end-column="0" />
           <folding>
             <element signature="e#1#12#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Agent.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.6399371" vertical-offset="2338" max-vertical-offset="4380">
+          <caret line="183" column="0" selection-start-line="183" selection-start-column="0" selection-end-line="183" selection-end-column="0" />
+          <folding>
+            <element signature="e#415#436#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ProblemResults.csv">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.15837105" vertical-offset="0" max-vertical-offset="663">
+          <caret line="7" column="0" selection-start-line="7" selection-start-column="0" selection-end-line="7" selection-end-column="0" />
+          <folding />
         </state>
       </provider>
     </entry>

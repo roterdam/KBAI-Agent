@@ -70,6 +70,7 @@ class Agent:
         "size": 3,
         "width": 5,
         "height": 5,
+        "alignment" :5,
         "angle": 7,
         "shape": 9,
 
@@ -89,6 +90,7 @@ class Agent:
 
 
         print "problem name: " + problem.name
+        print "problem type: " + problem.problemType
 
         # TODO: account for the angle
         # TODO: calculate
@@ -97,130 +99,179 @@ class Agent:
         figure_a = problem.figures["A"]
         figure_b = problem.figures["B"]
         figure_c = problem.figures["C"]
-        figure_d = problem.figures["D"]
-        figure_e = problem.figures["E"]
-        figure_f = problem.figures["F"]
-        figure_g = problem.figures["G"]
-        figure_h = problem.figures["H"]
+
+
         similarity_scores['A_B'] = self.CalculateFigureScores(figure_a, figure_b)
-        similarity_scores['A_D'] = self.CalculateFigureScores(figure_a, figure_d)
-        similarity_scores['B_C'] = self.CalculateFigureScores(figure_b, figure_c)
-        similarity_scores['B_E'] = self.CalculateFigureScores(figure_b, figure_e)
-        similarity_scores['C_F'] = self.CalculateFigureScores(figure_c, figure_f)
-        similarity_scores['E_H'] = self.CalculateFigureScores(figure_e, figure_h)
-        similarity_scores['E_F'] = self.CalculateFigureScores(figure_e, figure_f)
-        similarity_scores['D_E'] = self.CalculateFigureScores(figure_d, figure_e)
-        similarity_scores['D_G'] = self.CalculateFigureScores(figure_d, figure_g)
-        similarity_scores['G_H'] = self.CalculateFigureScores(figure_g, figure_h)
-
-        first_row_score = similarity_scores['A_B'] + similarity_scores['B_C']
-        second_row_score = similarity_scores['D_E'] + similarity_scores['E_F']
-
-        first_col_score = similarity_scores['A_D'] + similarity_scores['D_G']
-        second_col_score = similarity_scores['B_E'] + similarity_scores['E_H']
-
-        answers = {}
-
-        for x in range(1, 9):
-            candidate = problem.figures[str(x)]
-
-            scores_F_CANDIDATE = self.CalculateFigureScores(figure_f, candidate)
-            scores_H_CANDIDATE = self.CalculateFigureScores(figure_h, candidate)
-            # print "h:", scores_H_CANDIDATE, "f:",scores_F_CANDIDATE
-
-            col_distance = scores_F_CANDIDATE - similarity_scores['C_F']
-            row_distance = scores_H_CANDIDATE - similarity_scores['G_H']
-
-            third_col_score = similarity_scores['C_F'] + scores_F_CANDIDATE
-            third_row_score = similarity_scores['G_H'] + scores_H_CANDIDATE
-
-            candidate_score = (abs(col_distance) + abs(row_distance))+ \
-                              ( abs((first_row_score - second_row_score) - (second_row_score - third_row_score))) +\
-                              ( abs((first_col_score - second_col_score) - (second_col_score - third_col_score)))
-
-            answers[x]=candidate_score
+        similarity_scores['A_C'] = self.CalculateFigureScores(figure_a, figure_c)
 
 
-        best_candidates= []
-        first_lowest_index= min(answers, key=answers.get)
-        lowest_score=answers[first_lowest_index]
-        # print "count", best_candidates_count, "ls",lowest_score, "fls:", first_lowest_index
 
-        for k, v in answers.items():
-            if v==lowest_score:
-                best_candidates.append(k)
-        print "candidates", best_candidates
+        if problem.problemType=='3x3':
+            figure_d = problem.figures["D"]
+            figure_e = problem.figures["E"]
+            figure_f = problem.figures["F"]
+            figure_g = problem.figures["G"]
+            figure_h = problem.figures["H"]
 
-        if len(best_candidates)>1:
-            answer= self.calculateScoresBasedOnTransformations(best_candidates, answers, problem)
-            return answer
-        else:
-           return best_candidates[0]
+            similarity_scores['A_D'] = self.CalculateFigureScores(figure_a, figure_d)
+            similarity_scores['B_C'] = self.CalculateFigureScores(figure_b, figure_c)
+            similarity_scores['B_E'] = self.CalculateFigureScores(figure_b, figure_e)
+            similarity_scores['C_F'] = self.CalculateFigureScores(figure_c, figure_f)
+            similarity_scores['E_H'] = self.CalculateFigureScores(figure_e, figure_h)
+            similarity_scores['E_F'] = self.CalculateFigureScores(figure_e, figure_f)
+            similarity_scores['D_E'] = self.CalculateFigureScores(figure_d, figure_e)
+            similarity_scores['D_G'] = self.CalculateFigureScores(figure_d, figure_g)
+            similarity_scores['G_H'] = self.CalculateFigureScores(figure_g, figure_h)
+
+
+            first_row_score = similarity_scores['A_B'] + similarity_scores['B_C']
+            second_row_score = similarity_scores['D_E'] + similarity_scores['E_F']
+
+            first_col_score = similarity_scores['A_D'] + similarity_scores['D_G']
+            second_col_score = similarity_scores['B_E'] + similarity_scores['E_H']
+
+            answers = {}
+
+            for x in range(1, 9):
+                candidate = problem.figures[str(x)]
+
+                scores_F_CANDIDATE = self.CalculateFigureScores(figure_f, candidate)
+                scores_H_CANDIDATE = self.CalculateFigureScores(figure_h, candidate)
+                # print "h:", scores_H_CANDIDATE, "f:",scores_F_CANDIDATE
+
+                col_distance = scores_F_CANDIDATE - similarity_scores['C_F']
+                row_distance = scores_H_CANDIDATE - similarity_scores['G_H']
+
+                third_col_score = similarity_scores['C_F'] + scores_F_CANDIDATE
+                third_row_score = similarity_scores['G_H'] + scores_H_CANDIDATE
+
+                candidate_score = (abs(col_distance) + abs(row_distance))+ \
+                                  ( abs((first_row_score - second_row_score) - (second_row_score - third_row_score))) +\
+                                  ( abs((first_col_score - second_col_score) - (second_col_score - third_col_score)))
+
+                answers[x]=candidate_score
+
+
+            best_candidates= []
+            first_lowest_index= min(answers, key=answers.get)
+            lowest_score=answers[first_lowest_index]
+            # print "count", best_candidates_count, "ls",lowest_score, "fls:", first_lowest_index
+
+            for k, v in answers.items():
+                if v==lowest_score:
+                    best_candidates.append(k)
+            print "candidates", best_candidates
+
+            if len(best_candidates)>1:
+                answer= self.calculateScoresBasedOnTransformations(best_candidates, answers, problem)
+                return answer
+            else:
+               return best_candidates[0]
+        elif problem.problemType=='2x2':
+            answers={}
+            first_row_score = similarity_scores['A_B']
+            first_col_score = similarity_scores['A_C']
+            for x in range(1, 7):
+                candidate = problem.figures[str(x)]
+
+                scores_B_CANDIDATE = self.CalculateFigureScores(figure_b, candidate)
+                scores_C_CANDIDATE = self.CalculateFigureScores(figure_c, candidate)
+                # print "h:", scores_H_CANDIDATE, "f:",scores_F_CANDIDATE
+
+                col_distance = scores_B_CANDIDATE - similarity_scores['A_C']
+                row_distance = scores_C_CANDIDATE - similarity_scores['A_B']
+
+
+
+                candidate_score = (abs(col_distance) + abs(row_distance))
+
+                answers[x]=candidate_score
+
+
+            best_candidates= []
+            first_lowest_index= min(answers, key=answers.get)
+            lowest_score=answers[first_lowest_index]
+            # print "count", best_candidates_count, "ls",lowest_score, "fls:", first_lowest_index
+
+            for k, v in answers.items():
+                if v==lowest_score:
+                    best_candidates.append(k)
+            print "candidates", best_candidates
+
+            if len(best_candidates)>1:
+                visAgent = VisAgent()
+                answer = visAgent.Solve(problem, ['1','2','3','4','5','6'])
+                return answer
+            else:
+               return best_candidates[0]
+
+
+
 
 
 
     def calculateScoresBasedOnTransformations(self, best_candidates, answers, problem):
         best_scores ={}
+        if problem.problemType=='3x3':
+            for k in best_candidates:
+                best_scores[k]=answers[k]
+                if self.transformation_hash['C_F']['objects_added']==self.transformation_hash['F'+'_'+str(k)]['objects_added']:
+                    best_scores[k]-=1
+                else:
+                    best_scores[k]+=1
 
-        for k in best_candidates:
-            best_scores[k]=answers[k]
-            if self.transformation_hash['C_F']['objects_added']==self.transformation_hash['F'+'_'+str(k)]['objects_added']:
-                best_scores[k]-=1
+                if self.transformation_hash['G_H']['objects_added']==self.transformation_hash['H'+'_'+str(k)]['objects_added']:
+                    best_scores[k]-=1
+                else:
+                    best_scores[k]+=1
+
+            new_best_candidates=[]
+            for k, v in best_scores.items():
+                    if v == best_scores[min(best_scores, key=best_scores.get)]:
+                        new_best_candidates.append(k)
+            print "new candidates", new_best_candidates
+
+            if len(new_best_candidates)>1:
+
+                visAgent = VisAgent()
+                answer = visAgent.Solve(problem, new_best_candidates)
+                return answer
+
             else:
-                best_scores[k]+=1
-
-            if self.transformation_hash['G_H']['objects_added']==self.transformation_hash['H'+'_'+str(k)]['objects_added']:
-                best_scores[k]-=1
-            else:
-                best_scores[k]+=1
-
-        new_best_candidates=[]
-        for k, v in best_scores.items():
-                if v == best_scores[min(best_scores, key=best_scores.get)]:
-                    new_best_candidates.append(k)
-        print "new candidates", new_best_candidates
-
-        if len(new_best_candidates)>1:
-
-            visAgent = VisAgent()
-            answer = visAgent.Solve(problem, new_best_candidates)
-            return answer
-
-        else:
-             return new_best_candidates[0]
+                 return new_best_candidates[0]
 
 
     def calculateScoresBasedOnTransformedObjects(self, best_candidates, answers,problem):
         best_scores ={}
+        if problem.problemType=='3x3':
+            for k in best_candidates:
+                best_scores[k]=answers[k]
 
-        for k in best_candidates:
-            best_scores[k]=answers[k]
+                new_best_candidates=[]
+                if self.transformation_hash['C_F']['objects_transformed']==self.transformation_hash['F'+'_'+str(k)]['objects_transformed']:
+                    best_scores[k]-=1
+                else:
+                     best_scores[k]+=1
 
-            new_best_candidates=[]
-            if self.transformation_hash['C_F']['objects_transformed']==self.transformation_hash['F'+'_'+str(k)]['objects_transformed']:
-                best_scores[k]-=1
+                if self.transformation_hash['G_H']['objects_transformed']==self.transformation_hash['H'+'_'+str(k)]['objects_transformed']:
+                    best_scores[k]-=1
+                else:
+                    best_scores[k]+=1
+
+
+            # print best_scores
+            for k, v in best_scores.items():
+                    if v == best_scores[min(best_scores, key=best_scores.get)]:
+                        new_best_candidates.append(k)
+            # print "new obj candidates", new_best_candidates
+
+            if len(new_best_candidates)>1:
+                print "vis Agent"
+                visAgent = VisAgent()
+                answer = visAgent.Solve(problem, new_best_candidates)
+                return answer
             else:
-                 best_scores[k]+=1
-
-            if self.transformation_hash['G_H']['objects_transformed']==self.transformation_hash['H'+'_'+str(k)]['objects_transformed']:
-                best_scores[k]-=1
-            else:
-                best_scores[k]+=1
-
-
-        # print best_scores
-        for k, v in best_scores.items():
-                if v == best_scores[min(best_scores, key=best_scores.get)]:
-                    new_best_candidates.append(k)
-        # print "new obj candidates", new_best_candidates
-
-        if len(new_best_candidates)>1:
-            print "vis Agent"
-            visAgent = VisAgent()
-            answer = visAgent.Solve(problem, new_best_candidates)
-            return answer
-        else:
-             return new_best_candidates[0]
+                 return new_best_candidates[0]
 
 
     def CalculateFigureScores(self, fig1, fig2):

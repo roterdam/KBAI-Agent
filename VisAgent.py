@@ -13,17 +13,6 @@ class VisAgent:
             image = Image.open(figure.visualFilename).convert('L')
             problem_figures[figureName] = ImageOps.invert(image).filter(ImageFilter.GaussianBlur(3))
 
-        transforms['CF'] = self.generateTransform(problem_figures['C'], problem_figures['F'])
-        transforms['GH'] = self.generateTransform(problem_figures['G'], problem_figures['H'])
-        transforms['AB'] = self.generateTransform(problem_figures['A'], problem_figures['B'])
-        transforms['AD'] = self.generateTransform(problem_figures['A'], problem_figures['D'])
-        transforms['BC'] = self.generateTransform(problem_figures['B'], problem_figures['C'])
-        transforms['DE'] = self.generateTransform(problem_figures['D'], problem_figures['E'])
-        transforms['BE'] = self.generateTransform(problem_figures['B'], problem_figures['E'])
-        transforms['DG'] = self.generateTransform(problem_figures['D'], problem_figures['G'])
-        transforms['EF'] = self.generateTransform(problem_figures['E'], problem_figures['F'])
-        transforms['EH'] = self.generateTransform(problem_figures['E'], problem_figures['H'])
-
         scores={}
         row_scores ={}
         col_scores={}
@@ -31,22 +20,49 @@ class VisAgent:
         for x in answers:
 
             candidate = problem_figures[str(x)]
+            if problem.problemType=='3x3':
 
-            transforms['F'+ str(x)] = self.generateTransform(problem_figures['F'], candidate)
-            transforms['H'+ str(x)] = self.generateTransform(problem_figures['H'], candidate)
+                transforms['CF'] = self.generateTransform(problem_figures['C'], problem_figures['F'])
+                transforms['GH'] = self.generateTransform(problem_figures['G'], problem_figures['H'])
+                transforms['AB'] = self.generateTransform(problem_figures['A'], problem_figures['B'])
+                transforms['AD'] = self.generateTransform(problem_figures['A'], problem_figures['D'])
+                transforms['BC'] = self.generateTransform(problem_figures['B'], problem_figures['C'])
+                transforms['DE'] = self.generateTransform(problem_figures['D'], problem_figures['E'])
+                transforms['BE'] = self.generateTransform(problem_figures['B'], problem_figures['E'])
+                transforms['DG'] = self.generateTransform(problem_figures['D'], problem_figures['G'])
+                transforms['EF'] = self.generateTransform(problem_figures['E'], problem_figures['F'])
+                transforms['EH'] = self.generateTransform(problem_figures['E'], problem_figures['H'])
 
-            row_scores[x]=(transforms['AB']+transforms['BC'] )- (transforms['DE']+transforms['EF'] )\
-                      -(transforms['DE']+transforms['EF']-
-                        (transforms['GH']+transforms['H'+ str(x)] ))
+                transforms['F'+ str(x)] = self.generateTransform(problem_figures['F'], candidate)
+                transforms['H'+ str(x)] = self.generateTransform(problem_figures['H'], candidate)
 
-            col_scores[x]=(transforms['AD']+transforms['DG'] )\
-                      - (transforms['BE']+transforms['EH'] )\
-                      -(transforms['CF']+transforms['F'+ str(x)])
+                row_scores[x]=(transforms['AB']+transforms['BC'] )- (transforms['DE']+transforms['EF'] )\
+                          -(transforms['DE']+transforms['EF']-
+                            (transforms['GH']+transforms['H'+ str(x)] ))
 
-            scores[x]= abs(((transforms['CF']-transforms['F'+ str(x)])+\
-                       (transforms['GH']-transforms['H'+ str(x)])))/2
+                col_scores[x]=(transforms['AD']+transforms['DG'] )\
+                          - (transforms['BE']+transforms['EH'] )\
+                          -(transforms['CF']+transforms['F'+ str(x)])
 
-            avg_score[x]=(abs(row_scores[x]+scores[x]))/2
+                scores[x]= abs(((transforms['CF']-transforms['F'+ str(x)])+\
+                           (transforms['GH']-transforms['H'+ str(x)])))/2
+
+                avg_score[x]=(abs(row_scores[x]+scores[x]))/2
+
+            if problem.problemType=='2x2':
+                transforms['AB'] = self.generateTransform(problem_figures['A'], problem_figures['B'])
+                transforms['AC'] = self.generateTransform(problem_figures['A'], problem_figures['B'])
+
+                transforms['C'+ str(x)] = self.generateTransform(problem_figures['C'], candidate)
+                transforms['B'+ str(x)] = self.generateTransform(problem_figures['B'], candidate)
+
+                row_scores[x]=(transforms['AB'])- transforms['C'+ str(x)]
+
+                col_scores[x]=(transforms['AC']-transforms['B'+ str(x)])
+
+                scores[x]= abs(transforms['B'+ str(x)])+ abs(transforms['C'+ str(x)])/2
+
+                avg_score[x]=(abs(row_scores[x]+scores[x]))/2
 
         return min(scores,  key=scores.get)
 
